@@ -6,24 +6,18 @@ This repository contains two Dockerfiles that build the Mallob distributed solve
 
 ## Prerequisites
 
-First, this build process has been tested only on linux (AL2 and Ubuntu 20).  Builds on other platforms have not been tested.
+First, this build process has been tested only on linux.  Builds on other platforms have not been tested.
  
-Second, the build process requires that Docker is installed on the machine.  
-
-Third, the Mallob docker images are built on top of the base containers satcomp-base:leader and satcomp-base:worker.
-The process of building these base images (as well as many other aspects of building solvers for SAT-Comp) is described in the README.md file in the [https://github.com/aws-samples/aws-batch-comp-infrastructure-sample](https://github.com/aws-samples/aws-batch-comp-infrastructure-sample) repository. 
-Please follow the steps in this repository up to the point at which the base containers have been built.  
+Second, the build process requires that Docker is installed on the machine.
 
 ## How to Build
 
 To build the Mallob leader container: 
 
-1. Navigate to the `leader` subdirectory.
-2. Run `docker build -t mallob:leader .`
+1. Run `docker build -t mallob:leader -f DockerfileLeader .`
 
 To build the Mallob worker container:
 
-1. Navigate to the `worker` subdirectory.
-2. Run `docker build -t mallob:worker .`
+1. Run `docker build -t mallob:worker -f DockerfileWorker .`
 
 After building both images, run `docker image ls` and make sure you see both `mallob:leader` and `mallob:worker` in the list of images.
