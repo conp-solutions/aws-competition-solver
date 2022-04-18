@@ -1,0 +1,6 @@
+[submodule "infrastructure-base"]
+	path = infrastructure-base
+	url = https://github.com/conp-solutions/aws-batch-comp-infrastructure-sample.git
+[submodule "aws-batch-comp-infrastructure-sample"]
+	path = aws-batch-comp-infrastructure-sample
+	url = https://github.com/aws-samples/aws-batch-comp-infrastructure-sample.git
