@@ -1,8 +1,8 @@
 ################### SAT Base Image
-FROM ubuntu:20.04 AS satcomp_common_base_image
+FROM fedora:36 AS satcomp_common_base_image
 RUN useradd -ms /bin/bash ecs-user
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt install -y python3-pip git openssh-server openssh-server iproute2 openmpi-bin openmpi-common iputils-ping \
+RUN yum -y update \
+    && yum -y install python3-pip git openssh-server iproute openmpi-devel iputils \
     && mkdir /var/run/sshd \
     && sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd \
     && setcap CAP_NET_BIND_SERVICE=+eip /usr/sbin/sshd \
@@ -14,10 +14,15 @@ RUN apt-get update \
         && sed -i "s/UsePrivilegeSeparation yes/UsePrivilegeSeparation no/g" ~/.ssh/sshd_config \
         && printf "Host *\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config'
 
+# Make mpi available
+RUN dnf module enable -y openmpi
+ENV PATH="${PATH}:/usr/lib64/openmpi/bin/"
+
 ###################
+
 #worker image
 FROM satcomp_common_base_image AS satcomp_common_worker_base_image
-RUN apt-get install psmisc
+RUN yum install -y psmisc
 RUN pip3 install flask waitress boto3 pytz polling2
 COPY --chown=ecs-user aws-batch-comp-infrastructure-sample/src/arg_satcomp_solver_base /opt/amazon/arg_satcomp_solver_base
 COPY --chown=ecs-user aws-batch-comp-infrastructure-sample/src/satcomp-worker-image/resources/worker /competition/worker
@@ -26,7 +31,8 @@ ENV PYTHONPATH=/opt/amazon:.:
 RUN chmod u+x /opt/amazon/arg_satcomp_solver_base/worker_entrypoint.py
 RUN chmod u+x /competition/worker
 RUN chmod u+x /competition/cleanup
-RUN service ssh start
+# could start ssh server here, if required; however, fails for fedora
+# RUN service ssh start
 USER ecs-user
 EXPOSE 22
 ENTRYPOINT  /usr/sbin/sshd -D -f /home/ecs-user/.ssh/sshd_config & /opt/amazon/arg_satcomp_solver_base/worker_entrypoint.py
@@ -36,8 +42,8 @@ ENTRYPOINT  /usr/sbin/sshd -D -f /home/ecs-user/.ssh/sshd_config & /opt/amazon/a
 FROM satcomp_common_worker_base_image AS builder
 USER root
 #  Install required softwares
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt install -y cmake build-essential zlib1g-dev libopenmpi-dev wget unzip build-essential zlib1g-dev cmake python3 build-essential gfortran wget curl
+RUN yum -y update && \
+    yum install -y automake cmake file g++ gcc git glibc-static libstdc++-static make zlib-devel
 
 # Build Mallob (from conp_solutions)
 RUN git clone -b recent-solvers --depth=2 https://github.com/conp-solutions/mallob
