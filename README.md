@@ -12,12 +12,18 @@ Second, the build process requires that Docker is installed on the machine.
 
 ## How to Build
 
+Both containers depend on the joint common container. As this container creates
+the SSH secrets, make sure both the leader and the worker docker image are
+build bsaed on this image, using the below tag.
+
+1. Run `docker build -t conp-solutions-satcomp-solver:base -f DockerfileBase .`
+
 To build the Mallob leader container: 
 
-1. Run `docker build -t mallob:leader -f DockerfileLeader .`
+1. Run `docker build -t conp-solutions-satcomp-solver:leader -f DockerfileLeader .`
 
 To build the Mallob worker container:
 
-1. Run `docker build -t mallob:worker -f DockerfileWorker .`
+1. Run `docker build -t conp-solutions-satcomp-solver:worker -f DockerfileWorker .`
 
-After building both images, run `docker image ls` and make sure you see both `mallob:leader` and `mallob:worker` in the list of images.
+After building both images, run `docker image ls` and make sure you see both `conp-solutions-satcomp-solver:leader` and `conp-solutions-satcomp-solver:worker` in the list of images.
