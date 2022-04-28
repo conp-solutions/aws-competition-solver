@@ -10,6 +10,14 @@ First, this build process has been tested only on linux.  Builds on other platfo
  
 Second, the build process requires that Docker is installed on the machine.
 
+## Prepare Source
+
+This package uses other packages as dependencies. They are maintained via git submodules. To get the correct version of dependencies, get the submodules first:
+
+```
+git submodule update --init --recursive
+```
+
 ## How to Build
 
 To build the Mallob leader container: 
