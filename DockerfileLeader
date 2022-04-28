@@ -40,17 +40,18 @@ RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt install -y cmake build-essential zlib1g-dev libopenmpi-dev wget unzip build-essential zlib1g-dev cmake python3 build-essential gfortran wget curl
 
 # Build Mallob (from conp_solutions)
-RUN git clone -b recent-solvers --depth=2 https://github.com/conp-solutions/mallob
-WORKDIR mallob
-RUN ./build_mallob.sh
+ADD mallob /mallob-src/mallob
+ADD .git /mallob-src/.git
+WORKDIR /mallob-src/mallob
+RUN bash -x ./build_mallob.sh
 
 
 ################### Extract Mallob in run stage (final leader image)
 FROM satcomp_common_leader_base_image AS mallob_liaison
 WORKDIR /
 # Copy mallob and solver scripts
-COPY --from=builder /mallob/build/mallob mallob
-COPY --from=builder /mallob/build/mallob_sat_process mallob_sat_process
+COPY --from=builder /mallob-src/mallob/build/mallob mallob
+COPY --from=builder /mallob-src/mallob/build/mallob_sat_process mallob_sat_process
 COPY --chown=ecs-user /leader/run_mallob.sh /competition
 COPY --chown=ecs-user /leader/solver /competition
 USER ecs-user
