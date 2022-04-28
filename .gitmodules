@@ -4,3 +4,6 @@
 [submodule "aws-batch-comp-infrastructure-sample"]
 	path = aws-batch-comp-infrastructure-sample
 	url = https://github.com/aws-samples/aws-batch-comp-infrastructure-sample.git
+[submodule "mallob"]
+	path = mallob
+	url = https://github.com/conp-solutions/mallob.git
