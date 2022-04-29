@@ -1,12 +1,8 @@
 #!/bin/bash
 
-# Auto-select number of CPUs
-CPUS=$(nproc || cat /proc/cpuinfo | grep "^processor" -c)
-CPUS=$((CPUS / 2))
-[ "$CPUS" -lt 1 ] && CPUS=1
-mpirun --mca btl_tcp_if_include eth0 --allow-run-as-root -np 2 \
-  --hostfile $1 --use-hwthread-cpus --map-by node:PE=2 --bind-to none --report-bindings \
-  mallob -mono=$2 -satsolver="m" -cbbs=1500 -cbdf="1.0" \
-  -shufinp=0.03 -shufshcls=1 -slpp=$((50000000 * 4)) \
-  -cfhl=300 -ihlbd=8 -islbd=8 -fhlbd=8 -fslbd=8 -smcl=30 -hmcl=30 \
-  -s=1 -sleep=1000 -t="$CPUS" -appmode=thread -nolog "-v=2 -0o=1"
+# MergeSat, ignore host file, just consume input file
+
+# Rn on formula (parameter $2), with half the available cores
+mergesat "$2" -no-model -cores=-2
+
+exit 0

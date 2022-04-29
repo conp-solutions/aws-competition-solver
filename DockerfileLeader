@@ -32,26 +32,29 @@ EXPOSE 22
 ENTRYPOINT  /usr/sbin/sshd -D -f /home/ecs-user/.ssh/sshd_config & /opt/amazon/arg_satcomp_solver_base/leader_entrypoint.py
 
 
-################### Build Mallob
-FROM satcomp_common_leader_base_image AS builder
-USER root
-#  Install required softwares
-RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt install -y cmake build-essential zlib1g-dev libopenmpi-dev wget unzip build-essential zlib1g-dev cmake python3 build-essential gfortran wget curl
+################### Build MergeSat
 
-# Build Mallob (from conp_solutions)
-ADD mallob /mallob-src/mallob
-ADD .git /mallob-src/.git
-WORKDIR /mallob-src/mallob
-RUN bash -x ./build_mallob.sh
+FROM fedora:36 AS builder
+
+# Install basic MergeSat requirements for static linking
+RUN yum -y update && \
+    yum -y install apt-utils automake file g++ gcc git glibc-static libstdc++-static make
+# Import and build the solver
+ADD mergesat /opt/mergesat
+
+# Clean solver
+RUN cd /opt/mergesat && make clean
+RUN rm -rf /opt/mergesat/build
+
+# Build solver from scratch - link static against glibc
+RUN cd /opt/mergesat && make BUILD_TYPE=parallel r -j $(nproc) CXX_EXTRA_FLAGS=-DNO_PREFETCHING
 
 
 ################### Extract Mallob in run stage (final leader image)
 FROM satcomp_common_leader_base_image AS mallob_liaison
 WORKDIR /
 # Copy mallob and solver scripts
-COPY --from=builder /mallob-src/mallob/build/mallob mallob
-COPY --from=builder /mallob-src/mallob/build/mallob_sat_process mallob_sat_process
+COPY --from=builder /opt/mergesat/build/release/bin/mergesat mergesat
 COPY --chown=ecs-user /leader/run_mallob.sh /competition
 COPY --chown=ecs-user /leader/solver /competition
 USER ecs-user
