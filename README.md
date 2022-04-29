@@ -22,10 +22,10 @@ git submodule update --init --recursive
 
 To build the Mallob leader container: 
 
-1. Run `docker build -t mallob-MergeCadLing:leader -f DockerfileLeader .`
+1. Run `docker build -t merge-mallob:leader -f DockerfileLeader .`
 
 To build the Mallob worker container:
 
-1. Run `docker build -t mallob-MergeCadLing:worker -f DockerfileWorker .`
+1. Run `docker build -t merge-mallob:worker -f DockerfileWorker .`
 
-After building both images, run `docker image ls` and make sure you see both `mallob-MergeCadLing:leader` and `mallob-MergeCadLing:worker` in the list of images.
+After building both images, run `docker image ls` and make sure you see both `merge-mallob:leader` and `merge-mallob:worker` in the list of images.
