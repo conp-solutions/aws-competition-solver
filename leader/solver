@@ -75,11 +75,11 @@ class MallobParser:
         """
         with open(output_file) as f:
             raw_logs = f.read()
-            if "found result UNSAT" in raw_logs:
+            if "s UNSATISFIABLE" in raw_logs:
                 return "UNSATISFIABLE"
-            elif "found result SAT" in raw_logs:
+            elif "s SATISFIABLE" in raw_logs:
                 return "SATISFIABLE"
-            elif "UNKNOWN" in raw_logs:
+            elif "s UNKNOWN" in raw_logs:
                 return "UNKNOWN"
             else:
                 return "ERROR"
