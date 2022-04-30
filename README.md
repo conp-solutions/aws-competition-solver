@@ -29,3 +29,7 @@ To build the Mallob worker container:
 1. Run `docker build -t mergesat-aws:worker -f DockerfileWorker .`
 
 After building both images, run `docker image ls` and make sure you see both `mergesat-aws:leader` and `mergesat-aws:worker` in the list of images.
+
+# Note
+
+This MergeSat setup is not using mpirun. Hence, the solver will only work in the leader image, and not the worker image. This is intended, as MergeSat is not using MPI for now. As the parallel track is using a single node right now, this single image should be sufficient.
