@@ -29,3 +29,19 @@ To build the Mallob worker container:
 1. Run `docker build -t mallob-mergecadling:worker -f DockerfileWorker .`
 
 After building both images, run `docker image ls` and make sure you see both `mallob-mergecadling:leader` and `mallob-mergecadling:worker` in the list of images.
+
+## Test the Solver
+
+To test whether the solver works, you can setup a local CNF and hostfile, and next see whether mallob can be started as expected. The below two commands show how this can be achieved:
+
+Prepare a hostfile with localhost as the only available host.
+
+```
+echo "127.0.0.1" > ~/cnf/localhost.txt
+```
+
+Start the docker container, but directly execute mallob instead of the default entry point. Furthermore, you need to mount in the directory with the CNFs and the host file. Then, you can tell mallob to consume the hostfile, as well as the CNF, and start solving the formula.
+
+```
+docker run -it --rm -v ~/cnf:/cnf:ro --entrypoint /bin/sh mallob-mergecadling:leader -c "/competition/run_mallob.sh /cnf/localhost.txt /cnf/rook-20-0-0.cnf"
+```
